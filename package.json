@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://cs-kamei@github.com/cs-kamei/gulp_basic_package.git"
+    "url": "git+https://crea-develop@github.com/crea-develop/gulp_basic_package.git"
   },
   "author": "C.Kamei",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/cs-kamei/gulp_basic_package/issues"
+    "url": "https://github.com/crea-develop/gulp_basic_package/issues"
   },
-  "homepage": "https://github.com/cs-kamei/gulp_basic_package#readme",
+  "homepage": "https://github.com/crea-develop/gulp_basic_package#readme",
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-autoprefixer": "^3.1.1",
