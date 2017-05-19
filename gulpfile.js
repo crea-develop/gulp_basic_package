@@ -14,6 +14,8 @@ var rename          = require('gulp-rename');
 var plumber         = require('gulp-plumber');
 var concat          = require('gulp-concat');
 var changed         = require('gulp-changed');
+var replace         = require('gulp-replace');
+var fs              = require('graceful-fs');
 var del             = require('del');
 
 var paths = {
@@ -38,9 +40,42 @@ var paths = {
             sp  : 'dist/sp/assets/js/'
         }
     },
-    other : 'src/**/*.!(jpg|gif|png|php|html|scss|css|js)'
+    other       : 'src/**/*.!(jpg|gif|png|php|html|scss|css|*.scss|*.css|js|*.js)',
+    release     : {
+        dist    : 'release',
+        html    : 'dist/**/*.+(html|php)',
+        image   : 'dist/**/*.+(jpg|gif|png)',
+        js      : 'dist/**/*.js',
+        css     : 'dist/**/*.css',
+        other   : 'dist/**/*.!(html|php)'
+    }
 };
 
+// =======================================================
+// パスの書き換え設定
+// =======================================================
+// 書き換え前のパスのパターン
+var replace_path_pattern = /(\.\.\/)*assets\//g;
+// 書き換えるURL
+var replace_url = 'http://replace.url/assets/';
+
+// =======================================================
+// リリース用ファイル生成に関する設定
+// =======================================================
+// リリースファイル生成時にリプレースするテキスト
+var replace_text = {
+    pc : '<!-- === REPLACE PC TEXT === -->',
+    sp : '<!-- === REPLACE SP TEXT === -->'
+}
+// リプレース内容の記述してあるファイルパス
+var replace_file = {
+    pc : './_replace_pc_text.html',
+    sp : './_replace_sp_text.html'
+};
+
+// =======================================================
+// common.jsに結合するjsファイルの一覧
+// =======================================================
 var common_js_sort_pc = [
   'src/assets/js/common/jquery-3.2.0.min.js',
   'src/assets/js/common/jquery.easing.js'
@@ -188,4 +223,35 @@ gulp.task('common_js_sp', function() {
   .pipe(changed(paths.js.dist.sp))
   .pipe(concat('common.js'))                // 結合
   .pipe(gulp.dest(paths.js.dist.sp));
+});
+
+
+// リリース用ファイルの生成
+// ====================
+gulp.task('release', ['release_html', 'release_copy']);
+gulp.task('release_html', function () {
+    var pc_text = fs.readFileSync(replace_file.pc);
+    var sp_text = fs.readFileSync(replace_file.sp);
+    gulp
+    .src(paths.release.html)
+    .pipe(plumber())
+    .pipe(replace(replace_text.pc, pc_text))
+    .pipe(replace(replace_text.sp, sp_text))
+    .pipe(prettify())
+    .pipe(gulp.dest(paths.release.dist));
+});
+gulp.task('release_copy', function () {
+    gulp
+    .src(paths.release.other)
+    .pipe(gulp.dest(paths.release.dist));
+});
+
+
+// パスの書き換え
+// ====================
+gulp.task('release_path', function () {
+    gulp
+    .src([paths.release.html, paths.release.css, paths.release.js])
+    .pipe(replace(replace_path_pattern, replace_url))
+    .pipe(gulp.dest(paths.release.dist));
 });
