@@ -17,6 +17,7 @@ var changed         = require('gulp-changed');
 var replace         = require('gulp-replace');
 var fs              = require('graceful-fs');
 var del             = require('del');
+var browserSync     = require('browser-sync');
 
 var paths = {
     dist        : 'dist/',
@@ -127,13 +128,28 @@ gulp.task('copy', function () {
     .pipe(gulp.dest(paths.dist));
 });
 
+  // オートリロードタスク
+// ====================
+gulp.task('browser-sync', function() {
+    browserSync({
+        server: {
+            baseDir: "src/",
+            index: "index.html"
+        }
+    });
+});
+gulp.task('bs-reload', function () {
+    browserSync.reload();
+});
+
 // 監視タスク
 // ====================
-gulp.task('watch', function() {
+gulp.task('watch', ['browser-sync'], function() {
     gulp.watch(paths.html, ['html']);
     gulp.watch(paths.css.src, ['css']);
     gulp.watch(paths.js.src,   ['js']);
     gulp.watch(paths.other, ['copy']);
+    gulp.watch('dist/**', ['bs-reload']);
 });
 
 // 一括処理タスク
@@ -169,7 +185,7 @@ gulp.task('main_js', function() {
   gulp
   .src(paths.js.pc)
   .pipe(plumber())
-  .pipe(uglify({preserveComments: 'some'}))
+  .pipe(uglify({output: {comments: "some"}}))
   .pipe(changed(paths.js.dist.pc))
   .pipe(gulp.dest(paths.js.dist.pc));
 });
@@ -179,7 +195,7 @@ gulp.task('common_js', function() {
   gulp
   .src(common_js_sort_pc) // gulp/config.jsで設定
   .pipe(plumber())
-  .pipe(uglify({preserveComments: 'some'})) // minify
+  .pipe(uglify({output: {comments: "some"}})) // minify
   .pipe(changed(paths.js.dist.pc))
   .pipe(concat('common.js'))                // 結合
   .pipe(gulp.dest(paths.js.dist.pc));
@@ -209,7 +225,7 @@ gulp.task('main_js_sp', function() {
   gulp
   .src(paths.js.sp)
   .pipe(plumber())
-  .pipe(uglify({preserveComments: 'some'}))
+  .pipe(uglify({output: {comments: "some"}}))
   .pipe(changed(paths.js.dist.sp))
   .pipe(gulp.dest(paths.js.dist.sp));
 });
@@ -219,7 +235,7 @@ gulp.task('common_js_sp', function() {
   gulp
   .src(common_js_sort_sp) // gulp/config.jsで設定
   .pipe(plumber())
-  .pipe(uglify({preserveComments: 'some'})) // minify
+  .pipe(uglify({output: {comments: "some"}})) // minify
   .pipe(changed(paths.js.dist.sp))
   .pipe(concat('common.js'))                // 結合
   .pipe(gulp.dest(paths.js.dist.sp));

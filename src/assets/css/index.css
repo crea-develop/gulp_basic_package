@@ -5,10 +5,19 @@ body {
     font-size: 14px;
 }
 
-/* === 亀井の変更 === */
 h1, h2, h3, h4, h5, h6 {
     font-weight: normal;
     line-height: 1;
 }
-/* === 亀井の変更 === */
 
+#wrapper {
+    margin: 0 auto;
+    width: 980px;
+}
+#wrapper h1 {
+    font-size: 20px;
+    font-weight: bold;
+}
+#wrapper h1 a {
+    color: #f00;
+}
